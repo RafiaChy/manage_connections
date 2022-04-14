@@ -1,27 +1,25 @@
 part of 'manage_connections_bloc.dart';
 
 class ManageConnectionsState extends Equatable {
-  const ManageConnectionsState(
-   {this.activeTile = 'all_enabled'} 
+  const ManageConnectionsState({
+    this.listOfTiles = const [],
+    this.status= ActiveScreenStatus.initial,}
   );
-  final String activeTile;
+  final List<TileModel?> listOfTiles;
+  final ActiveScreenStatus status;
   
   @override
-  List<Object> get props => [activeTile];
+  List<Object> get props => [listOfTiles, status];
 
   ManageConnectionsState copyWith({
-    String? activeTile,
+    List<TileModel?>? listOfTiles,
+    ActiveScreenStatus? status,
   }) {
     return ManageConnectionsState(
-      activeTile: activeTile ?? this.activeTile,
+      listOfTiles: listOfTiles ?? this.listOfTiles,
+      status: status ?? this.status,
     );
   }
 }
 
-class ManageConnectionsInitial extends ManageConnectionsState {}
-
-class SelectedAppState extends ManageConnectionsState{
-  
-}
-class LoadingAndSyncingState extends ManageConnectionsState{}
-class SyncedState extends ManageConnectionsState{}
+enum ActiveScreenStatus {creating, initial, selectedApp, loading, syncing, synced }

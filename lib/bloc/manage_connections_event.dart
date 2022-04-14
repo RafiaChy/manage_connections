@@ -6,5 +6,21 @@ abstract class ManageConnectionsEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
-class SelectedAppEvent extends ManageConnectionsEvent{}
-class ConnectAppEvent extends ManageConnectionsEvent{}
+class CreateListOfTilesEvent extends ManageConnectionsEvent {
+  final List<TileModel> listOfTiles;
+  const CreateListOfTilesEvent({required this.listOfTiles});
+  @override
+  List<Object> get props => [listOfTiles];
+}
+class SelectedAppEvent extends ManageConnectionsEvent{
+  final TileModel selectedTile;
+  const SelectedAppEvent({required this.selectedTile});
+  @override
+  List<Object> get props => [selectedTile];
+}
+class ConnectAppEvent extends ManageConnectionsEvent{
+  final TileModel syncedTile;
+  const ConnectAppEvent({required this.syncedTile});
+  @override
+  List<Object> get props => [syncedTile];
+}

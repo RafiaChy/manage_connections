@@ -55,18 +55,60 @@ class _ApplicationsState extends State<Applications> {
                 }); 
               } ,),
              const SizedBox(width: 30),
-             Tile(image: 'samsung_health.png', title: activeTile == 'enabled'? 'Samsung H': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Samsung H' ? true : false, onTap: () {
-                Future.delayed(const Duration(milliseconds: 6000), () {
+            //  Tile(image: 'samsung_health.png', title: activeTile == 'enabled'? 'Samsung H': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Samsung H' ? true : false, onTap: () {
+            //     Future.delayed(const Duration(milliseconds: 6000), () {
+            //       setState(() {
+            //         activeTile = 'Synced';
+                     
+            //       });
+            //     });
+            //     setState(() {
+            //       activeTile = changingTheActiveTile('Samsung H');
+                  
+            //     }); 
+            //   }  ,),
+            GestureDetector(
+              onTap: (){    Future.delayed(const Duration(milliseconds: 6000), () {
                   setState(() {
                     activeTile = 'Synced';
-                     
                   });
                 });
                 setState(() {
-                  activeTile = changingTheActiveTile('Samsung H');
+                 activeTile = changingTheActiveTile('Google Fit');
                   
-                }); 
-              }  ,),
+                }); },
+              child: Container(
+                       height: 170,
+                       width: 170,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(13.3,),
+                border: Border.all(
+                            color: activeTile == 'enabled' || activeTile == 'Synced' ? Colors.blue : Colors.black12,
+                            width: 1,
+                )),
+              padding: const EdgeInsets.fromLTRB(35, 27, 35, 27),
+              child: Column(
+                  children: [
+                    Image.asset('assets/samsung_health.png', color: activeTile =='enabled' || activeTile == 'Synced' ? null: const Color.fromRGBO(255, 255, 255, 0.5),
+                    colorBlendMode: BlendMode.modulate),
+                    const SizedBox(height: 12,),
+                    Center(
+                        child: Row( 
+                          children: [
+                            Text( activeTile == 'enabled'? 'Samsung H': activeTile , style: TextStyle(color: Colors.black),),
+                            activeTile == 'Synced'? SizedBox(
+                              height: 15,
+                              width: 14,
+                              child:  Image.asset('assets/carbon_settings.png')): Container()
+                          ],
+                        ),
+                      ),
+                    
+                  ],
+                ),
+                
+                      ),
+            )
             ],),
           const SizedBox(height: 30),
         Row( 
