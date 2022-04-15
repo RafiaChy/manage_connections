@@ -37,19 +37,11 @@ class Tile extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(35, 27, 35, 27),
             child: Column(
                 children: [
-                  Image.asset('assets/$image', color: enable? null: const Color.fromRGBO(255, 255, 255, 0.5),
+                  Image.asset(image, color: enable? null: const Color.fromRGBO(255, 255, 255, 0.5),
                   colorBlendMode: BlendMode.modulate),
                   const SizedBox(height: 12,),
                   Center(
-                      child: Row( 
-                        children: [
-                          Text( title , style: TextStyle(color: color),),
-                          title == 'Synced'? SizedBox(
-                            height: 15,
-                            width: 14,
-                            child:  Image.asset('assets/carbon_settings.png')): Container()
-                        ],
-                      ),
+                      child: Text( title , style: TextStyle(color: color),),
                     ),
                   
                 ],

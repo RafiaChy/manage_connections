@@ -5,11 +5,13 @@ class TileModel extends Equatable {
   final String imagePath;
   bool isSelected;
   bool isSynced;
+ 
   TileModel({
     required this.title,
     required this.imagePath,
     required this.isSelected,
     required this.isSynced,
+    
   });
 
   @override

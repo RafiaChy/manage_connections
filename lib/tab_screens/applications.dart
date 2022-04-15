@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:layout_screen_manage/bloc/manage_connections_bloc.dart';
+import 'package:layout_screen_manage/models/tile_model.dart';
 import 'package:layout_screen_manage/widgets/tile.dart';
 
 class Applications extends StatefulWidget {
@@ -14,222 +17,248 @@ class _ApplicationsState extends State<Applications> {
   String changingTheActiveTile(String tileName){
     return tileName;
   }
+  List<TileModel> tiles = [
+    TileModel(title: 'Google Fit', imagePath: 'assets/Google_Fit_1.png', isSelected: true, isSynced: false),
+    TileModel(title: 'Samsung H', imagePath: 'assets/samsung_health.png', isSelected: true, isSynced: false),
+    TileModel(title: 'Mi Fit', imagePath: 'assets/Mi_Fit_1.png', isSelected: true, isSynced: false),
+    TileModel(title: 'Garmin C', imagePath: 'assets/Garmin_Connect_1.png', isSelected: true, isSynced: false),
+  ];
+  @override
+  void initState() {
+  
+    super.initState();
+  }
 
   var disconnected = true;
   var message = 'Please wait while we connect...';
+   var message1 = 'Please wait while we synchronize...';
 
   @override
   Widget build(BuildContext context) {
 
-    return  disconnected || activeTile == 'Synced'? Container(
-      padding: const EdgeInsets.all(4),
-      child: Column(
-        children: [
-         Container(
-           margin: const EdgeInsets.only(left: 20, right: 20, top: 42),
-           child: Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-             children: const [
-               Text('Choose one of the apps', style: TextStyle(fontSize: 23),),
-               Text('info'),
+    return   BlocProvider(
+      create: (context) => ManageConnectionsBloc()..add(CreateListOfTilesEvent(listOfTiles: tiles)),
+      child: BlocListener<ManageConnectionsBloc, ManageConnectionsState>(
+        listener: (context, state) {
+          if(state.status == ActiveScreenStatus.syncing){
+               Future.delayed(const Duration(seconds: 5), () {
+ context.read<ManageConnectionsBloc>().add(ConnectAppEvent(syncedTile: state.selectedTile!));
+});  }
+          if(state.status == ActiveScreenStatus.loading){
+           
+
+    Future.delayed(const Duration(seconds: 5), () {
+  context.read<ManageConnectionsBloc>().add(SyncingEvent());
+});
+  }
+ },
+        child: BlocBuilder<ManageConnectionsBloc, ManageConnectionsState>(
+              
+              builder: (context, state) {
+                print('from builder ${state.status}');
+                
+               if(state.status == ActiveScreenStatus.loading){
+                
+                   return Column(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       buildImageHolder(state.selectedTile!.imagePath),
+                       const SizedBox(height: 9),
+                       Text(message),
+                       const SizedBox(height: 100,)
+                     ],
+                   );
+                 
+                
+               }
+               if(state.status == ActiveScreenStatus.syncing){
+
+                   return Column(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       buildImageHolder(state.selectedTile!.imagePath),
+                       const SizedBox(height: 9),
+                       Text(message1),
+                       const SizedBox(height: 100,)
+                     ],
+                   );
+                
+                
+               }
+               
+                
+              if(state.status == ActiveScreenStatus.creating) {
+                return const CircularProgressIndicator();
+              }
+              if(state.status == ActiveScreenStatus.initial || state.status == ActiveScreenStatus.selectedApp) {
+                 return Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Column(
+                        children: [
+                         Container(
+                           margin: const EdgeInsets.only(left: 20, right: 20, top: 42),
+                           child: Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: const [
+                               Text('Choose one of the apps', style: TextStyle(fontSize: 23),),
+                               Text('info'),
+                             ],
+                           ),
+                         ),
+                         
+                      Container(
+                     margin: const EdgeInsets.only(top: 47, left: 15, right: 15),
+                      child:Column(
+                          
+                          children: [
+                            Row(
+                              children:  [
+                            
+                Tile(image: state.listOfTiles[0]!.imagePath, title: state.listOfTiles[0]!.title, enable: state.listOfTiles[0]!.isSelected, onTap: (){
+                  context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[0]!));
+                }),
+                const SizedBox(width: 30),
+                Tile(image: state.listOfTiles[1]!.imagePath, title: state.listOfTiles[1]!.title, enable: state.listOfTiles[1]!.isSelected, onTap: (){
+                  context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[1]!));
+                }),
              ],
            ),
-         ),
-         
-      Container(
-     margin: const EdgeInsets.only(top: 47, left: 15, right: 15),
-      child:Column(
-          
-          children: [
-            Row(
-              children:  [
-              Tile(image: 'Google_Fit_1.png', title: activeTile == 'enabled'? 'Google Fit': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Google Fit' ? true : false, onTap: () {
-                Future.delayed(const Duration(milliseconds: 6000), () {
-                  setState(() {
-                    activeTile = 'Synced';
-                  });
-                });
-                setState(() {
-                 activeTile = changingTheActiveTile('Google Fit');
-                  
-                }); 
-              } ,),
-             const SizedBox(width: 30),
-            //  Tile(image: 'samsung_health.png', title: activeTile == 'enabled'? 'Samsung H': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Samsung H' ? true : false, onTap: () {
-            //     Future.delayed(const Duration(milliseconds: 6000), () {
-            //       setState(() {
-            //         activeTile = 'Synced';
-                     
-            //       });
-            //     });
-            //     setState(() {
-            //       activeTile = changingTheActiveTile('Samsung H');
-                  
-            //     }); 
-            //   }  ,),
-            GestureDetector(
-              onTap: (){    Future.delayed(const Duration(milliseconds: 6000), () {
-                  setState(() {
-                    activeTile = 'Synced';
-                  });
-                });
-                setState(() {
-                 activeTile = changingTheActiveTile('Google Fit');
-                  
-                }); },
-              child: Container(
-                       height: 170,
-                       width: 170,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(13.3,),
-                border: Border.all(
-                            color: activeTile == 'enabled' || activeTile == 'Synced' ? Colors.blue : Colors.black12,
-                            width: 1,
-                )),
-              padding: const EdgeInsets.fromLTRB(35, 27, 35, 27),
-              child: Column(
-                  children: [
-                    Image.asset('assets/samsung_health.png', color: activeTile =='enabled' || activeTile == 'Synced' ? null: const Color.fromRGBO(255, 255, 255, 0.5),
-                    colorBlendMode: BlendMode.modulate),
-                    const SizedBox(height: 12,),
-                    Center(
-                        child: Row( 
-                          children: [
-                            Text( activeTile == 'enabled'? 'Samsung H': activeTile , style: TextStyle(color: Colors.black),),
-                            activeTile == 'Synced'? SizedBox(
-                              height: 15,
-                              width: 14,
-                              child:  Image.asset('assets/carbon_settings.png')): Container()
-                          ],
-                        ),
-                      ),
-                    
-                  ],
-                ),
-                
-                      ),
-            )
-            ],),
-          const SizedBox(height: 30),
-        Row( 
-        children:  [ 
-     Tile(image: 'Mi_Fit_1.png', title: activeTile == 'enabled'? 'Mi Fit': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Mi Fit' ? true : false, onTap: () {
-                Future.delayed(const Duration(milliseconds: 6000), () {
-                  setState(() {
-                    activeTile = 'Synced';
-                     
-                  });
-                });
-                setState(() {
-                  activeTile = changingTheActiveTile('Mi Fit');
-                   
-                }); 
-              }  ), 
-     const SizedBox(width: 30),
 
-     Tile(image: 'Garmin_Connect_1.png', title: activeTile == 'enabled'? 'Garmin C': activeTile, enable: activeTile == 'enabled' || activeTile == 'Synced'? true: activeTile == 'Garmin C' ? true : false, onTap: () {
-             Future.delayed(const Duration(milliseconds: 6000), () {
-                  setState(() {
-                    activeTile = 'Synced';
-                     
-                  });
-                });
-                setState(() {
-                  activeTile = changingTheActiveTile('Garmin C');
-                 
-                }); 
-              }, ),
-        ],
-    )
-     ],
-  ),
-  
-    ),
-      const SizedBox(height: 60,),
-    
-     ElevatedButton(onPressed: (){
-    
-      Future.delayed(const Duration(milliseconds: 3000), () {
-                setState(() {
-                   message = 'Please wait while we synchronize...';
+       const SizedBox(height: 30),
+             Row( children: [
+                        Tile(image: state.listOfTiles[2]!.imagePath, title: state.listOfTiles[2]!.title, enable: state.listOfTiles[2]!.isSelected, onTap: (){
+                   context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[2]!));
+                 }),
+                 const SizedBox(width: 30),
+                 Tile(image: state.listOfTiles[3]!.imagePath, title: state.listOfTiles[3]!.title, enable: state.listOfTiles[3]!.isSelected, onTap: (){
+                   context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[3]!));
+                 }), 
+                      ],
+                    )
+                ],      ),
+                  
+                    ),
+               const SizedBox(height: 60,),
+                    
+                 ElevatedButton(onPressed: (){ 
                    
-                });
-              });
-   
-      setState(() {
-         disconnected = false;
-        
-      });
-     
-   
-    }, style: 
-    ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-        RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18.0),
-      
-    )),
-    backgroundColor:  MaterialStateProperty.resolveWith<Color>(
-             (Set<MaterialState> states) {
-               if (states.contains(MaterialState.pressed) || activeTile == 'Google Fit' ? true : false || activeTile == 'Mi Fit'? true : false || activeTile == 'Samsung H'? true : false || activeTile == 'Garmin C') {
-                 return Colors.blue;
-               } 
-                return Colors.blueGrey.shade100;
-             },
+                context.read<ManageConnectionsBloc>().add(LoadingEvent());
+                 }, style: 
+                    ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      
+                    )),
+                    backgroundColor:  MaterialStateProperty.resolveWith<Color>(
+                             (Set<MaterialState> states) {
+                               if (state.selectedTile == null) {
+                                 return Colors.blueGrey.shade100;
+                               } 
+                                return Colors.blue;
+                             },
+                           ),
+                     
+                    ),
+                     child: Container(
+                      width: 182,
+                      height: 47,
+                      alignment: Alignment.center,
+                      child: const Text('Connect', style: TextStyle(color:  Colors.white, fontSize: 18 ),),
+                    ))
+                       ],
+                      ),
+                    );
+              }
+
+               return    Container(
+                      padding: const EdgeInsets.all(4),
+                      child: Column(
+                        children: [
+                         Container(
+                           margin: const EdgeInsets.only(left: 20, right: 20, top: 42),
+                           child: Row(
+                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             children: const [
+                               Text('Choose one of the apps', style: TextStyle(fontSize: 23),),
+                               Text('info'),
+                             ],
+                           ),
+                         ),
+                         
+                      Container(
+                     margin: const EdgeInsets.only(top: 47, left: 15, right: 15),
+                      child:Column(
+                          
+                          children: [
+                            Row(
+                              children:  [
+                            
+                Tile(image: state.listOfTiles[0]!.imagePath, title: state.listOfTiles[0]!.isSelected ? 'Synced' : state.listOfTiles[0]!.title, enable: state.listOfTiles[0]!.isSelected, onTap: (){
+                  context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[0]!));
+                }),
+                const SizedBox(width: 30),
+                Tile(image: state.listOfTiles[1]!.imagePath, title: state.listOfTiles[1]!.isSelected ? 'Synced' : state.listOfTiles[1]!.title, enable: state.listOfTiles[1]!.isSelected, onTap: (){
+                  context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[1]!));
+                }),
+             ],
            ),
-         ),
-     child: Container(
-      width: 182,
-      height: 47,
-      alignment: Alignment.center,
-      child: Text('Connect', style: TextStyle(color: activeTile == 'Google Fit'   || activeTile == 'Mi Fit' || activeTile == 'Samsung H' || activeTile == 'Garmin C'? Colors.white: Colors.blueGrey, fontSize: 18 ),),
-    ))
-       ],
-      ),
-    ): Container(
-       margin: const EdgeInsets.only(bottom: 70),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if(activeTile == 'Google Fit')
-         Column(
-           children: [
-             buildImageHolder('Google_Fit_1.png'),
-             const SizedBox(height: 15),
-             Text(message),
-           
-           ],
-         ),
-          if(activeTile == 'Mi Fit')
-          Column(children: [
-               buildImageHolder('Mi_Fit_1.png'),
-               const SizedBox(height: 15),
-               Text(message),
-          ],),
-        
-          if(activeTile == 'Samsung H')
-          Column(
-          children: [
-          buildImageHolder('samsung_health.png'),
-          const SizedBox(height: 15),
-          Text(message),
-            ]
-          ),
-   
-          if(activeTile == 'Garmin C')
-          Column(children: [
-          buildImageHolder('Garmin_Connect_1.png'),
-          const SizedBox(height: 15),
-          Text(message),
-          ],),
-        ],
+
+       const SizedBox(height: 30),
+             Row( children: [
+                        Tile(image: state.listOfTiles[2]!.imagePath, title: state.listOfTiles[2]!.isSelected ? 'Synced' : state.listOfTiles[2]!.title, enable: state.listOfTiles[2]!.isSelected, onTap: (){
+                   context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[2]!));
+                 }),
+                 const SizedBox(width: 30),
+                 Tile(image: state.listOfTiles[3]!.imagePath, title: state.listOfTiles[3]!.isSelected ? 'Synced' : state.listOfTiles[3]!.title, enable: state.listOfTiles[3]!.isSelected, onTap: (){
+                   context.read<ManageConnectionsBloc>().add(SelectedAppEvent(selectedTile: state.listOfTiles[3]!));
+                 }), 
+                      ],
+                    )
+                ],      ),
+                  
+                    ),
+               const SizedBox(height: 60,),
+                    
+                 ElevatedButton(onPressed: (){ 
+                   
+                context.read<ManageConnectionsBloc>().add(LoadingEvent());
+                 }, style: 
+                    ButtonStyle(
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      
+                    )),
+                    backgroundColor:  MaterialStateProperty.resolveWith<Color>(
+                             (Set<MaterialState> states) {
+                               if (state.selectedTile == null || state.status == ActiveScreenStatus.synced) {
+                                 return Colors.blueGrey.shade100;
+                               } 
+                                return Colors.blue;
+                             },
+                           ),
+                     
+                    ),
+                     child: Container(
+                      width: 182,
+                      height: 47,
+                      alignment: Alignment.center,
+                      child: const Text('Connect', style: TextStyle(color: Colors.white, fontSize: 18 ),),
+                    ))
+                       ],
+                      ),
+                    );
+              },
+            ),
       ),
     );
   }
 
-  Container buildImageHolder(image) {
-    if(image == 'Google_Fit_1.png' || image == 'samsung_health.png' 
-    || image == 'Mi_Fit_1.png' || image ==  'Garmin_Connect_1.png'){
+ 
+  Container buildImageHolder(String image) {
+    if(image == 'assets/Google_Fit_1.png' || image == 'assets/samsung_health.png' 
+    || image == 'assets/Mi_Fit_1.png' || image ==  'assets/Garmin_Connect_1.png'){
     
       return Container(
         width: 50,
@@ -237,7 +266,7 @@ class _ApplicationsState extends State<Applications> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(13.49)
         ),
-        child: Image.asset('assets/$image'),
+        child: Image.asset(image),
       );
     }
     else{

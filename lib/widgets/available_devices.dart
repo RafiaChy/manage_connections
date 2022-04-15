@@ -22,7 +22,7 @@ class AvailableDevices extends StatelessWidget {
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               itemBuilder: (BuildContext context, int index){
-              return  DevicesAvailable(brandName: availableDevices[index], onTap:  onTap(availableDevices[index]) );
+              return  DevicesAvailable(brandName: availableDevices[index] );
               
             }, itemCount: availableDevices.length,),
          

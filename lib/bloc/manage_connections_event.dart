@@ -18,9 +18,18 @@ class SelectedAppEvent extends ManageConnectionsEvent{
   @override
   List<Object> get props => [selectedTile];
 }
+
+class LoadingEvent extends ManageConnectionsEvent{
+   
+}
+class SyncingEvent extends ManageConnectionsEvent{
+
+}
+
 class ConnectAppEvent extends ManageConnectionsEvent{
   final TileModel syncedTile;
   const ConnectAppEvent({required this.syncedTile});
   @override
   List<Object> get props => [syncedTile];
 }
+

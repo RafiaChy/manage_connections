@@ -4,10 +4,10 @@ class DevicesAvailable extends StatelessWidget {
   const DevicesAvailable({
     Key? key,
     required this.brandName,
-    required this.onTap,
+ 
   }) : super(key: key);
   final String brandName;
-  final Null Function(String name) onTap;
+  
  
 
   @override
@@ -28,7 +28,7 @@ class DevicesAvailable extends StatelessWidget {
             flex: 2,
             child: Text(brandName)),
           
-          IconButton(onPressed:(){onTap(brandName);}, icon: const Icon(Icons.add, color: Colors.black,)),
+          IconButton(onPressed:(){}, icon: const Icon(Icons.add, color: Colors.black,)),
         ],
       ),
     );
